@@ -1,0 +1,23 @@
+# Global Secrets & Env Files
+.env
+.env.local
+.env.production
+.env.development
+.env.staging
+.env.test
+
+# Global dependencies
+node_modules/
+
+# Global builds
+dist/
+build/
+.next/
+out/
+
+# Log and temp files
+*.log
+.temp/
+tmp/
+.DS_Store
+Thumbs.db
