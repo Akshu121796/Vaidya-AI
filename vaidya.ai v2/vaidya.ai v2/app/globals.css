@@ -1,0 +1,103 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 224 71% 4%;
+    --foreground: 210 20% 98%;
+
+    --card: 224 71% 6%;
+    --card-foreground: 210 20% 98%;
+
+    --popover: 224 71% 5%;
+    --popover-foreground: 210 20% 98%;
+
+    --primary: 160 84% 39%;
+    --primary-foreground: 210 20% 98%;
+
+    --secondary: 217.2 32.6% 12%;
+    --secondary-foreground: 210 20% 98%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 187 90% 45%;
+    --accent-foreground: 224 71% 4%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 20% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 160 84% 39%;
+
+    --radius: 1rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+  }
+  body {
+    @apply bg-background text-foreground;
+    background-image: 
+      radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.07) 0px, transparent 50%),
+      radial-gradient(at 100% 0%, rgba(6, 182, 212, 0.07) 0px, transparent 50%),
+      radial-gradient(at 50% 100%, rgba(99, 102, 241, 0.05) 0px, transparent 50%);
+    background-attachment: fixed;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Outfit', sans-serif;
+    @apply tracking-tight font-extrabold;
+  }
+  
+  /* Keyboard Focus Accessibility ring */
+  *:focus-visible {
+    @apply outline-none ring-2 ring-primary ring-offset-2 ring-offset-[#090d16] transition-all;
+  }
+}
+
+/* Custom Utilities for Premium Apple Health & Perplexity Style */
+.glass-panel {
+  @apply bg-card/65 backdrop-blur-md border border-white/5 shadow-xl transition-all duration-300;
+}
+
+.glass-panel-hover {
+  @apply transition-all duration-300 hover:bg-card/85 hover:border-white/10 hover:shadow-2xl hover:shadow-primary/5;
+}
+
+.glow-emerald {
+  text-shadow: 0 0 12px rgba(16, 185, 129, 0.4);
+}
+
+.glow-cyan {
+  text-shadow: 0 0 12px rgba(6, 182, 212, 0.4);
+}
+
+.linear-gradient-border {
+  background: linear-gradient(var(--card), var(--card)) padding-box,
+              linear-gradient(135deg, rgba(16, 185, 129, 0.3), rgba(6, 182, 212, 0.3)) border-box;
+  border: 1px solid transparent;
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-neutral-800 rounded-full hover:bg-neutral-700 transition-colors;
+}
+
+/* Recharts Tooltip Overrides */
+.recharts-default-tooltip {
+  @apply glass-panel rounded-lg border-white/10 !important;
+}

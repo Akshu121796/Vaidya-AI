@@ -21,3 +21,9 @@ out/
 tmp/
 .DS_Store
 Thumbs.db
+
+# Large media & backups
+*.mp4
+*.zip
+scratch/
+

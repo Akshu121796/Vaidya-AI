@@ -1,0 +1,28 @@
+# Dependency directories
+node_modules/
+
+# Build outputs
+dist/
+build/
+*.tsbuildinfo
+
+# Env variables / Secrets
+.env
+.env.production
+.env.development
+.env.local
+.env.staging
+
+# Log files
+*.log
+logs/
+
+# Diagnostic / Coverage
+coverage/
+.nyc_output/
+
+# Temp files / OS metadata
+.DS_Store
+Thumbs.db
+.temp/
+tmp/

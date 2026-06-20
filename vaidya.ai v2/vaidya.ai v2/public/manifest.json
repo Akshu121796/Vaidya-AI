@@ -1,0 +1,22 @@
+{
+  "theme_color": "#090d16",
+  "background_color": "#090d16",
+  "display": "standalone",
+  "scope": "/",
+  "start_url": "/",
+  "name": "Vaidya.ai",
+  "short_name": "Vaidya",
+  "description": "Next-Gen AI Healthcare Platform",
+  "icons": [
+    {
+      "src": "https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&q=80&w=192",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&q=80&w=512",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

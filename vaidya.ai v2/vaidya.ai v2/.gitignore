@@ -1,0 +1,23 @@
+# Next.js build and cache
+.next/
+out/
+build/
+
+# Dependency directories
+node_modules/
+
+# Env variables / Secrets
+.env
+.env.local
+.env.production
+.env.development
+.env.staging
+
+# Log files
+*.log
+
+# OS metadata / Temp
+.DS_Store
+Thumbs.db
+.temp/
+tmp/
