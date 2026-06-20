@@ -89,7 +89,9 @@ async function main() {
   try {
     const app = await buildServer();
 
-    startNotificationWorker();
+    if (env.NODE_ENV !== 'production') {
+      startNotificationWorker();
+    }
     
     const address = await app.listen({
       port: env.PORT,
