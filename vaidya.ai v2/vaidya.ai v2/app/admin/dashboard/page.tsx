@@ -38,6 +38,10 @@ import { Button } from "@/components/ui/button";
 import { useHealthStore } from "@/store/useHealthStore";
 import { useToast } from "@/components/ui/toast";
 import api from "@/lib/api";
+import dynamic from "next/dynamic";
+
+const OutbreakMap = dynamic(() => import("@/components/outbreak-map"), { ssr: false });
+
 
 // Analytics Metrics
 const PATIENTS_GROWTH = [
@@ -70,24 +74,26 @@ const OUTBREAK_WARNINGS = [
   { 
     id: "out-1", 
     disease: "Dengue Surge Warning", 
-    location: "Village Zone C (Sector 4)", 
+    location: "Rampura Phul", 
     details: "14 clinical cases reported in past 48 hours. Epidemic anomaly flagged.", 
     status: "Critical" 
   },
   { 
     id: "out-2", 
     disease: "Gastroenteritis Cluster", 
-    location: "Village Sector 2", 
+    location: "Barnala", 
     details: "8 cases recorded matching waterborne infection symptoms.", 
     status: "Warning" 
   }
 ];
 
 const VILLAGE_HEAT_ALERTS = [
-  { sector: "Zone C (Sector 4)", symptom: "High Fever & Joint Pain", cases: 14, alert: "Critical", syncTime: "10 min ago" },
-  { sector: "Sector 2", symptom: "Diarrhea & Vomiting", cases: 8, alert: "Warning", syncTime: "25 min ago" },
-  { sector: "Sector 9", symptom: "Mild Cold & Cough", cases: 22, alert: "Stable", syncTime: "1 hour ago" },
-  { sector: "Sector 11", symptom: "Dry Cough & Congestion", cases: 5, alert: "Stable", syncTime: "3 hours ago" },
+  { sector: "Rampura Phul", symptom: "High Fever & Joint Pain", cases: 14, alert: "Critical", syncTime: "10 min ago" },
+  { sector: "Barnala", symptom: "Diarrhea & Vomiting", cases: 8, alert: "Warning", syncTime: "25 min ago" },
+  { sector: "Sangrur", symptom: "Mild Cold & Cough", cases: 22, alert: "Stable", syncTime: "1 hour ago" },
+  { sector: "Nabha", symptom: "Dry Cough & Congestion", cases: 5, alert: "Stable", syncTime: "3 hours ago" },
+  { sector: "Malerkotla", symptom: "Fever & Rash", cases: 12, alert: "Critical", syncTime: "12 min ago" },
+  { sector: "Sunam", symptom: "Vomiting & Dehydration", cases: 6, alert: "Warning", syncTime: "45 min ago" },
 ];
 
 const USER_REGISTRY = [
@@ -130,7 +136,7 @@ const ADMIN_TRANSLATIONS = {
     utilizationTitle: "Doctor Specialty Utilization",
     averageCapacity: "Average capacity loads per department.",
     feverReports: "Village Fever & Pathogen Heat Reports",
-    villageSector: "Village Sector",
+    villageSector: "Village Location",
     flaggedSymptom: "Flagged Symptom",
     activeCases: "Active Cases",
     severity: "Severity",
@@ -147,7 +153,14 @@ const ADMIN_TRANSLATIONS = {
     syncState: "Sync State",
     online: "Online",
     offline: "Offline",
-    synced: "Synced"
+    synced: "Synced",
+    exportAuditReports: "Export System Audit Reports",
+    exportDesc: "Compile regional demographics, medicine distributions, and outbreak warnings into ABDM-compliant audits.",
+    exportCsv: "Export CSV Sheet",
+    exportPdf: "Export PDF Report",
+    pendingVisits: "Pending physical visits",
+    toastTitle: "Generating System Audit Report",
+    toastDesc: "Downloading Vaidya_Telemetry_Audit_{time}.{format}"
   },
   Hindi: {
     welcome: "स्वागत है",
@@ -181,7 +194,7 @@ const ADMIN_TRANSLATIONS = {
     utilizationTitle: "डॉक्टर विशेषज्ञता उपयोग",
     averageCapacity: "प्रति विभाग औसत क्षमता भार।",
     feverReports: "ग्राम बुखार और रोगज़नक़ हीट रिपोर्ट",
-    villageSector: "ग्राम क्षेत्र",
+    villageSector: "ग्राम स्थान",
     flaggedSymptom: "चिह्नित लक्षण",
     activeCases: "सक्रिय मामले",
     severity: "तीव्रता",
@@ -198,7 +211,14 @@ const ADMIN_TRANSLATIONS = {
     syncState: "सिंक स्थिति",
     online: "ऑनलाइन",
     offline: "ऑफ़लाइन",
-    synced: "सिंक किया गया"
+    synced: "सिंक किया गया",
+    exportAuditReports: "सिस्टम ऑडिट रिपोर्ट निर्यात करें",
+    exportDesc: "क्षेत्रीय जनसांख्यिकी, दवा वितरण, और प्रकोप चेतावनियों को एबीडीएम-अनुरूप ऑडिट में संकलित करें।",
+    exportCsv: "CSV शीट निर्यात करें",
+    exportPdf: "PDF रिपोर्ट निर्यात करें",
+    pendingVisits: "लंबित शारीरिक मुलाकातें",
+    toastTitle: "सिस्टम ऑडिट रिपोर्ट जनरेट की जा रही है",
+    toastDesc: "Vaidya_Telemetry_Audit_{time}.{format} डाउनलोड हो रहा है"
   },
   Marathi: {
     welcome: "स्वागत आहे",
@@ -232,7 +252,7 @@ const ADMIN_TRANSLATIONS = {
     utilizationTitle: "डॉक्टर विशेषज्ञता वापर",
     averageCapacity: "प्रति विभाग सरासरी क्षमता भार.",
     feverReports: "गाव ताप आणि रोगजनक हीट अहवाल",
-    villageSector: "गाव विभाग",
+    villageSector: "गाव ठिकाण",
     flaggedSymptom: "चिन्हांकित लक्षण",
     activeCases: "सक्रिय केसेस",
     severity: "तीव्रता",
@@ -249,7 +269,14 @@ const ADMIN_TRANSLATIONS = {
     syncState: "सिंक स्थिती",
     online: "ऑनलाइन",
     offline: "ऑफलाइन",
-    synced: "सिंक केलेले"
+    synced: "सिंक केलेले",
+    exportAuditReports: "सिस्टम ऑडिट अहवाल निर्यात करा",
+    exportDesc: "प्रादेशिक लोकसंख्याशास्त्र, औषध वितरण आणि उद्रेक चेतावणी एबीडीएम-सुसंगत ऑडिटमध्ये संकलित करा.",
+    exportCsv: "CSV पत्रक निर्यात करा",
+    exportPdf: "PDF अहवाल निर्यात करा",
+    pendingVisits: "प्रलंबित शारीरिक भेटी",
+    toastTitle: "सिस्टम ऑडिट अहवाल तयार करत आहे",
+    toastDesc: "Vaidya_Telemetry_Audit_{time}.{format} डाउनलोड होत आहे"
   }
 };
 
@@ -274,6 +301,25 @@ export default function AdminDashboardPage() {
 
   const [outbreakList, setOutbreakList] = useState(OUTBREAK_WARNINGS);
   const [heatmapAlerts, setHeatmapAlerts] = useState(VILLAGE_HEAT_ALERTS);
+  const [focusLocation, setFocusLocation] = useState<{ lat: number; lng: number } | null>(null);
+
+  const VILLAGE_COORDS: Record<string, [number, number]> = {
+    "Nabha":         [30.3742, 76.1422],
+    "Rampura Phul":  [30.2632, 75.8234],
+    "Barnala":       [30.3806, 75.5493],
+    "Sangrur":       [30.2452, 75.8369],
+    "Malerkotla":    [30.5290, 75.8826],
+    "Dhuri":         [30.3695, 75.8665],
+    "Sunam":         [30.1279, 75.7978],
+    "Lehragaga":     [30.1706, 75.9533],
+    "Moonak":        [29.9971, 75.9106],
+    "Budhlada":      [29.9249, 75.5575],
+    "Mansa":         [29.9914, 75.3872],
+    "Bhikhi":        [30.0423, 75.6231],
+    "Bhadaur":       [30.2027, 75.5891],
+    "Patran":        [30.0552, 76.0367],
+    "Nabha Rural":   [30.3500, 76.1100],
+  };
 
   useEffect(() => {
     if (activeTabParam) setActiveTab(activeTabParam);
@@ -324,8 +370,8 @@ export default function AdminDashboardPage() {
 
   const handleExport = (format: "csv" | "pdf") => {
     toast({
-      title: "Generating System Audit Report",
-      description: `Downloading Vaidya_Telemetry_Audit_${Date.now()}.${format}`,
+      title: t.toastTitle,
+      description: t.toastDesc.replace("{time}", String(Date.now())).replace("{format}", format),
       variant: "default"
     });
   };
@@ -419,7 +465,7 @@ export default function AdminDashboardPage() {
                 </CardHeader>
                 <CardContent className="p-4 pt-0">
                   <div className="text-xl font-extrabold text-white">{activeAppts}</div>
-                  <p className="text-[9px] text-muted-foreground mt-1">{stats ? (activeLang === "English" ? "Live from database" : activeLang === "Hindi" ? "डेटाबेस से लाइव" : "डेटाबेसमधून लाइव्ह") : 'Pending physical visits'}</p>
+                  <p className="text-[9px] text-muted-foreground mt-1">{stats ? (activeLang === "English" ? "Live from database" : activeLang === "Hindi" ? "डेटाबेस से लाइव" : "डेटाबेसमधून लाइव्ह") : t.pendingVisits}</p>
                 </CardContent>
               </Card>
 
@@ -546,39 +592,73 @@ export default function AdminDashboardPage() {
 
         {/* Tab: Outbreaks */}
         {activeTab === "outbreaks" && (
-          <div className="flex flex-col gap-4">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{t.feverReports}</h3>
-            <div className="rounded-xl border border-white/5 bg-black/40 overflow-hidden">
-              <div className="overflow-x-auto w-full">
-                <table className="w-full text-left border-collapse min-w-[600px]">
-                  <thead>
-                    <tr className="border-b border-white/5 bg-white/5 text-[10px] uppercase font-bold text-muted-foreground">
-                      <th className="p-3.5">{t.villageSector}</th>
-                      <th className="p-3.5">{t.flaggedSymptom}</th>
-                      <th className="p-3.5">{t.activeCases}</th>
-                      <th className="p-3.5">{t.severity}</th>
-                      <th className="p-3.5">{activeLang === "English" ? "Last Synced Time" : activeLang === "Hindi" ? "अंतिम सिंक समय" : "शेवटची सिंक वेळ"}</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-white/5 text-xs text-muted-foreground">
-                    {VILLAGE_HEAT_ALERTS.map((alert, idx) => (
-                      <tr key={idx} className="hover:bg-white/5 transition-all">
-                        <td className="p-3.5 font-bold text-white flex items-center gap-1.5">
-                          <MapPin className="h-4 w-4 text-primary" />
-                          {alert.sector}
-                        </td>
-                        <td className="p-3.5">{alert.symptom}</td>
-                        <td className="p-3.5 font-bold text-white">{alert.cases}</td>
-                        <td className="p-3.5">
-                          <Badge variant={alert.alert === "Critical" ? "destructive" : alert.alert === "Warning" ? "warning" : "default"} className="text-[8px] py-0.5 px-2 tracking-wider">
-                            {alert.alert}
-                          </Badge>
-                        </td>
-                        <td className="p-3.5 font-mono text-[10px]">{alert.syncTime}</td>
+          <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-1">
+              <h3 className="text-sm font-bold text-white uppercase tracking-wider">{t.outbreakHeat}</h3>
+              <p className="text-[11px] text-muted-foreground">Interactive cluster maps and live symptom vectors sync.</p>
+            </div>
+
+            {/* Outbreak Map Card */}
+            <div className="glass-panel border-white/5 bg-[#0b101c]/45 p-4 rounded-xl flex flex-col gap-3 shadow-xl">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-slate-300 uppercase tracking-wider">📡 Regional Telemetry Map</span>
+                <span className="text-[10px] text-primary font-mono bg-primary/10 px-2 py-0.5 rounded-full border border-primary/20 animate-pulse">Live Scan</span>
+              </div>
+              <OutbreakMap 
+                alerts={heatmapAlerts.map(h => ({
+                  name: h.sector,
+                  cases: h.cases,
+                  symptom: h.symptom,
+                  alert: h.alert as "Critical" | "Warning" | "Stable",
+                  syncTime: h.syncTime
+                }))}
+                focusLocation={focusLocation}
+              />
+            </div>
+
+            <div className="flex flex-col gap-3">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{t.feverReports}</h3>
+              <div className="rounded-xl border border-white/5 bg-black/40 overflow-hidden shadow-lg">
+                <div className="overflow-x-auto w-full">
+                  <table className="w-full text-left border-collapse min-w-[600px]">
+                    <thead>
+                      <tr className="border-b border-white/5 bg-white/5 text-[10px] uppercase font-bold text-muted-foreground">
+                        <th className="p-3.5">{t.villageSector}</th>
+                        <th className="p-3.5">{t.flaggedSymptom}</th>
+                        <th className="p-3.5">{t.activeCases}</th>
+                        <th className="p-3.5">{t.severity}</th>
+                        <th className="p-3.5">{activeLang === "English" ? "Last Synced Time" : activeLang === "Hindi" ? "अंतिम सिंक समय" : "शेवटची सिंक वेळ"}</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody className="divide-y divide-white/5 text-xs text-muted-foreground">
+                      {heatmapAlerts.map((alert, idx) => (
+                        <tr 
+                          key={idx} 
+                          className="hover:bg-white/5 hover:text-white transition-all cursor-pointer"
+                          onClick={() => {
+                            const coords = VILLAGE_COORDS[alert.sector];
+                            if (coords) {
+                              setFocusLocation({ lat: coords[0], lng: coords[1] });
+                            }
+                          }}
+                        >
+                          <td className="p-3.5 font-bold text-white flex items-center gap-1.5">
+                            <MapPin className="h-4 w-4 text-primary" />
+                            {alert.sector}
+                          </td>
+                          <td className="p-3.5">{alert.symptom}</td>
+                          <td className="p-3.5 font-bold text-white">{alert.cases}</td>
+                          <td className="p-3.5">
+                            <Badge variant={alert.alert === "Critical" ? "destructive" : alert.alert === "Warning" ? "warning" : "default"} className="text-[8px] py-0.5 px-2 tracking-wider">
+                              {alert.alert}
+                            </Badge>
+                          </td>
+                          <td className="p-3.5 font-mono text-[10px]">{alert.syncTime}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           </div>
@@ -588,10 +668,10 @@ export default function AdminDashboardPage() {
         {activeTab === "reports" && (
           <Card className="glass-panel border-white/5 bg-[#0b101c]/55 max-w-xl mx-auto rounded-xl p-6 flex flex-col gap-4">
             <h3 className="text-xs uppercase font-extrabold text-white tracking-wider border-b border-white/5 pb-2">
-              Export System Audit Reports
+              {t.exportAuditReports}
             </h3>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              Compile regional demographics, medicine distributions, and outbreak warnings into ABDM-compliant audits.
+              {t.exportDesc}
             </p>
 
             <div className="grid grid-cols-2 gap-4 mt-2">
@@ -601,7 +681,7 @@ export default function AdminDashboardPage() {
                 className="rounded-xl border-white/10 hover:bg-white/5 h-11 text-xs font-bold flex items-center justify-center gap-2"
               >
                 <FileSpreadsheet className="h-4.5 w-4.5 text-emerald-400" />
-                Export CSV Sheet
+                {t.exportCsv}
               </Button>
               <Button 
                 onClick={() => handleExport("pdf")}
@@ -609,7 +689,7 @@ export default function AdminDashboardPage() {
                 className="rounded-xl border-white/10 hover:bg-white/5 h-11 text-xs font-bold flex items-center justify-center gap-2"
               >
                 <Download className="h-4.5 w-4.5 text-primary" />
-                Export PDF Report
+                {t.exportPdf}
               </Button>
             </div>
           </Card>

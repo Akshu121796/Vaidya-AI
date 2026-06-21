@@ -133,7 +133,10 @@ const MEDICINE_TRANSLATIONS = {
     noMedsFound: "No matching medicines found.",
     selectMedPrompt: "Select a medication from the directory list on the left to review details.",
     brandSelectedTitle: "Brand Selected",
-    brandSelectedDesc: "Generic alternative chosen: {alt}. Search index to view profiles."
+    brandSelectedDesc: "Generic alternative chosen: {alt}. Search index to view profiles.",
+    conflictDesc: "Check if taking **{med}** along with another compound triggers clinical conflicts.",
+    reserveTitle: "Medicine Reserved!",
+    reserveDesc: "1 unit of {med} reserved at {pharmacy}. Ready for pick up."
   },
   Hindi: {
     pageTitle: "दवा सूची",
@@ -163,7 +166,10 @@ const MEDICINE_TRANSLATIONS = {
     noMedsFound: "कोई मिलती-जुलती दवा नहीं मिली।",
     selectMedPrompt: "विवरण की समीक्षा करने के लिए बाईं ओर सूची से एक दवा चुनें।",
     brandSelectedTitle: "ब्रांड चुना गया",
-    brandSelectedDesc: "जेनेरिक विकल्प चुना गया: {alt}। प्रोफाइल देखने के लिए खोजें।"
+    brandSelectedDesc: "जेनेरिक विकल्प चुना गया: {alt}। प्रोफाइल देखने के लिए खोजें।",
+    conflictDesc: "जांचें कि क्या {med} को किसी अन्य दवा के साथ लेने से कोई प्रतिकूल प्रभाव पड़ता है।",
+    reserveTitle: "दवा आरक्षित!",
+    reserveDesc: "{pharmacy} पर {med} की 1 इकाई आरक्षित की गई है। पिकअप के लिए तैयार है।"
   },
   Marathi: {
     pageTitle: "औषध सूची",
@@ -193,7 +199,10 @@ const MEDICINE_TRANSLATIONS = {
     noMedsFound: "कोणतेही जुळणारे औषध आढळले नाही.",
     selectMedPrompt: "तपशील पाहण्यासाठी डावीकडील सूचीमधून औषध निवडा.",
     brandSelectedTitle: "ब्रँड निवडला",
-    brandSelectedDesc: "जेनेरिक पर्याय निवडला: {alt}। प्रोफाइल पाहण्यासाठी शोधा।"
+    brandSelectedDesc: "जेनेरिक पर्याय निवडला: {alt}। प्रोफाइल पाहण्यासाठी शोधा।",
+    conflictDesc: "तपासा की {med} ला इतर औषधांसोबत घेतल्यास काही दुष्परिणाम होतात का.",
+    reserveTitle: "औषध आरक्षित!",
+    reserveDesc: "{pharmacy} वर {med} चे 1 युनिट आरक्षित केले आहे. पिकअपसाठी तयार आहे."
   }
 };
 
@@ -278,8 +287,8 @@ export default function MedicineSearch() {
 
   const handleReserve = (pharmacy: string, medName: string) => {
     toast({
-      title: "Medicine Reserved!",
-      description: `1 unit of ${medName} reserved at ${pharmacy}. Ready for pick up.`,
+      title: t.reserveTitle,
+      description: t.reserveDesc.replace("{med}", medName).replace("{pharmacy}", pharmacy),
       variant: "default"
     });
   };
@@ -394,7 +403,7 @@ export default function MedicineSearch() {
                   </button>
                 ))
               ) : (
-                <p className="text-xs text-muted-foreground text-center py-6">No matching medicines found.</p>
+                <p className="text-xs text-muted-foreground text-center py-6">{t.noMedsFound}</p>
               )}
             </div>
           </div>
@@ -414,9 +423,9 @@ export default function MedicineSearch() {
                     
                     <div className="flex items-center gap-2">
                       <Badge variant={activeMedicine.requiresPrescription ? "destructive" : "default"} className="text-[8px] font-bold uppercase px-2 py-0.5">
-                        {activeMedicine.requiresPrescription ? "Rx Required" : "OTC Safe"}
+                        {activeMedicine.requiresPrescription ? t.rxRequired : t.otcSafe}
                       </Badge>
-                      <span className="text-xs font-mono font-bold text-white bg-white/5 px-2 py-0.5 rounded border border-white/10">Base Price: ₹{activeMedicine.price}</span>
+                      <span className="text-xs font-mono font-bold text-white bg-white/5 px-2 py-0.5 rounded border border-white/10">{t.basePrice}: ₹{activeMedicine.price}</span>
                     </div>
                   </div>
                 </CardHeader>
@@ -424,13 +433,13 @@ export default function MedicineSearch() {
                 <CardContent className="pt-4 flex flex-col gap-4 text-xs">
                   {/* Description */}
                   <div>
-                    <h4 className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider mb-1">Therapeutic Action</h4>
+                    <h4 className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider mb-1">{t.therapeuticAction}</h4>
                     <p className="text-foreground/90 leading-relaxed text-[11px]">{activeMedicine.description}</p>
                   </div>
 
                   {/* Usages list */}
                   <div>
-                    <h4 className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider mb-1.5">Clinical Usages</h4>
+                    <h4 className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider mb-1.5">{t.clinicalUsages}</h4>
                     <div className="flex flex-wrap gap-1.5">
                       {activeMedicine.usages.map((use) => (
                         <Badge key={use} className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[9px] font-bold py-0.5 px-2.5">
@@ -545,7 +554,7 @@ export default function MedicineSearch() {
                               className="w-full mt-3 rounded-lg text-[9px] h-7 font-bold flex items-center gap-1 border-white/10 hover:bg-primary/10 hover:border-primary hover:text-primary transition-all"
                             >
                               <HeartHandshake className="h-3 w-3" />
-                              Reserve Medication
+                              {t.reserveMedication}
                             </Button>
                           )}
                         </Card>
@@ -555,15 +564,15 @@ export default function MedicineSearch() {
 
                   {/* Alternatives */}
                   <div>
-                    <h4 className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider mb-1.5">Lower-Cost Substitutes (Generic Alternatives)</h4>
+                    <h4 className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider mb-1.5">{t.genericSubstitutes}</h4>
                     <div className="flex flex-wrap gap-1.5">
                       {activeMedicine.alternatives.map((alt) => (
                         <span 
                           key={alt} 
                           onClick={() => {
                             toast({
-                              title: "Brand Selected",
-                              description: `Generic alternative chosen: ${alt}. Search index to view profiles.`,
+                              title: t.brandSelectedTitle,
+                              description: t.brandSelectedDesc.replace("{alt}", alt),
                               variant: "default"
                             });
                           }}
@@ -578,7 +587,7 @@ export default function MedicineSearch() {
 
                   {/* Dosage */}
                   <div className="p-3 rounded-xl bg-white/5 border border-white/5">
-                    <span className="text-[9px] font-bold text-primary uppercase tracking-wider block">Standard Dosage Directives</span>
+                    <span className="text-[9px] font-bold text-primary uppercase tracking-wider block">{t.standardDosage}</span>
                     <p className="text-white font-semibold mt-1 leading-relaxed text-[11px]">{activeMedicine.dosage}</p>
                   </div>
 
@@ -590,9 +599,9 @@ export default function MedicineSearch() {
                 <CardHeader className="pb-3">
                   <CardTitle className="text-xs font-bold flex items-center gap-1.5">
                     <FileWarning className="h-4.5 w-4.5 text-cyan-400" />
-                    Drug Interaction Analyzer
+                    {t.interactionAnalyzer}
                   </CardTitle>
-                  <CardDescription className="text-[10px]">Check if taking **{activeMedicine.name}** along with another compound triggers clinical conflicts.</CardDescription>
+                  <CardDescription className="text-[10px]">{t.conflictDesc.replace("{med}", activeMedicine.name)}</CardDescription>
                 </CardHeader>
                 
                 <CardContent className="pt-1 flex flex-col gap-4 text-xs">
@@ -603,7 +612,7 @@ export default function MedicineSearch() {
                         onChange={(e) => handleCheckInteraction(e.target.value)}
                         className="bg-[#0d121f]"
                       >
-                        <option value="" disabled>Select medication to compare...</option>
+                        <option value="" disabled>{t.selectToCompare}</option>
                         {MOCK_MEDICINES.filter(m => m.id !== activeMedicine.id).map((med) => (
                           <option key={med.id} value={med.id}>{med.name}</option>
                         ))}
@@ -627,7 +636,7 @@ export default function MedicineSearch() {
                         ) : (
                           <CheckCircle2 className="h-4 w-4 text-emerald-400" />
                         )}
-                        <span>Conflict Severity: {interactionResult.severity || "Safe / Clear"}</span>
+                        <span>{activeLang === "English" ? "Conflict Severity: " : activeLang === "Hindi" ? "पारस्परिक क्रिया तीव्रता: " : "परस्पर क्रिया तीव्रता: "}{interactionResult.severity || (activeLang === "English" ? "Safe / Clear" : activeLang === "Hindi" ? "सुरक्षित / स्पष्ट" : "सुरक्षित / स्पष्ट")}</span>
                       </div>
                       <p className="text-[11px] font-semibold">{interactionResult.text}</p>
                     </div>
@@ -638,7 +647,7 @@ export default function MedicineSearch() {
             </div>
           ) : (
             <div className="lg:col-span-2 text-center py-12">
-              <p className="text-xs text-muted-foreground">Select a medication from the directory list on the left to review details.</p>
+              <p className="text-xs text-muted-foreground">{t.selectMedPrompt}</p>
             </div>
           )}
 
