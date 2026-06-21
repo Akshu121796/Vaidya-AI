@@ -4,7 +4,7 @@
  * Automatically injects JWT token into every authenticated request
  */
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://vaidya-ai-production.up.railway.app';
 
 // ── Token Management ─────────────────────────────────────────────────────────
 export const getToken = (): string | null => {
@@ -51,9 +51,9 @@ async function apiFetch<T = unknown>(
   const json = await res.json().catch(() => ({ message: 'Server error', success: false }));
 
   if (!res.ok) {
-    const errorMsg = json.message || 
-                     (json.error && typeof json.error === 'object' ? json.error.message : json.error) || 
-                     `Request failed: ${res.status}`;
+    const errorMsg = json.message ||
+      (json.error && typeof json.error === 'object' ? json.error.message : json.error) ||
+      `Request failed: ${res.status}`;
     throw new Error(errorMsg);
   }
 
@@ -91,9 +91,9 @@ export const api = {
 
     const json = await res.json().catch(() => ({ message: 'Server error', success: false }));
     if (!res.ok) {
-      const errorMsg = json.message || 
-                       (json.error && typeof json.error === 'object' ? json.error.message : json.error) || 
-                       `Request failed: ${res.status}`;
+      const errorMsg = json.message ||
+        (json.error && typeof json.error === 'object' ? json.error.message : json.error) ||
+        `Request failed: ${res.status}`;
       throw new Error(errorMsg);
     }
     return json as T;
