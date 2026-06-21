@@ -26,4 +26,4 @@ Thumbs.db
 *.mp4
 *.zip
 scratch/
-
+*.tsbuildinfo
